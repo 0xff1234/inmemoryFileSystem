@@ -19,15 +19,15 @@ public class AbsolutePathTest {
 		AbsolutePath absPath = new AbsolutePath(new InfoNode("/", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("foo", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("bar", FileType.DIRECTORY));
-		assertEquals("/foo/bar", absPath.toString());
+		assertEquals("/foo/bar", absPath.toPathStr());
 
 		AbsolutePath absPath2 = new AbsolutePath(absPath);
 
-		assertEquals("/foo/bar", absPath2.toString());
+		assertEquals("/foo/bar", absPath2.toPathStr());
 
 		absPath2.appendRelativePath(new InfoNode("zzz",FileType.DIRECTORY));
-		assertEquals("/foo/bar/zzz", absPath2.toString());
-		assertEquals("/foo/bar", absPath.toString());
+		assertEquals("/foo/bar/zzz", absPath2.toPathStr());
+		assertEquals("/foo/bar", absPath.toPathStr());
 
 	}
 
@@ -36,7 +36,8 @@ public class AbsolutePathTest {
 		AbsolutePath absPath = new AbsolutePath(new InfoNode("/", FileType.DIRECTORY));
 		absPath.appendRelativePath(new InfoNode("foo", FileType.DIRECTORY));
 		absPath.appendRelativePath(new InfoNode("bar", FileType.DIRECTORY));
-		assertEquals("/foo/bar", absPath.toString());
+		assertEquals("/foo/bar", absPath.toPathStr());
+		System.out.println(absPath);
 	}
 
 	@Test
@@ -45,18 +46,18 @@ public class AbsolutePathTest {
 		AbsolutePath absPath = new AbsolutePath(new InfoNode("/", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("foo", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("bar", FileType.DIRECTORY));
-		assertEquals("/foo/bar", absPath.toString());
+		assertEquals("/foo/bar", absPath.toPathStr());
 
 		ret = absPath.removeLowest();
 		assertTrue(ret);
-		assertEquals("/foo", absPath.toString());
+		assertEquals("/foo", absPath.toPathStr());
 
 		ret = absPath.removeLowest();
 		assertTrue(ret);
-		assertEquals("/", absPath.toString());
+		assertEquals("/", absPath.toPathStr());
 
 		ret = absPath.removeLowest();
-		assertEquals("/", absPath.toString());
+		assertEquals("/", absPath.toPathStr());
 		assertFalse(ret);
 	}
 
@@ -67,7 +68,7 @@ public class AbsolutePathTest {
 		AbsolutePath absPath = new AbsolutePath(new InfoNode("/", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("foo", FileType.DIRECTORY));
 		ret = absPath.appendRelativePath(new InfoNode("bar", FileType.DIRECTORY));
-		assertEquals("/foo/bar", absPath.toString());
+		assertEquals("/foo/bar", absPath.toPathStr());
 
 		List<InfoNode> immutablePaths = absPath.immutablePaths();
 

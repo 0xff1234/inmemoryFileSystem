@@ -1,6 +1,5 @@
 package com.lyj.mfs.domain;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -119,11 +118,11 @@ public class InfoNode {
 	}
 
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-			.add("path",path)
-			.add("fileType", fileType)
-			.toString();
-	}
+//	@Override
+//	public String toString() {
+//		return MoreObjects.toStringHelper(this)
+//			.add("path",path)
+//			.add("fileType", fileType)
+//			.toString();
+//	}
 }

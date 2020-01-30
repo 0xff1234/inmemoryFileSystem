@@ -1,7 +1,10 @@
 package com.lyj.mfs;
 
+import static com.lyj.mfs.domain.InfoNode.FileType.DIRECTORY;
+import static com.lyj.mfs.domain.InfoNode.FileType.FILE;
 import static com.lyj.mfs.utils.Const.ROOT_PATH;
 
+import com.google.common.base.MoreObjects;
 import com.lyj.mfs.domain.InfoNode;
 import com.lyj.mfs.domain.InfoNode.FileType;
 import java.util.Map;
@@ -43,6 +46,10 @@ public class InMemoryFileSystem {
 		}
 	}
 
+	public static InMemoryFileSystem getInstance(){
+		return instance;
+	}
+
 	/**
 	 * @return a new session for visiting the in memory file system
 	 */
@@ -53,10 +60,59 @@ public class InMemoryFileSystem {
 	}
 
 	private InMemoryFileSystem() {
-		//working dir is the same as root at begining
 	}
 
 	public InfoNode getRoot() {
-		return root;
+		return this.root;
+	}
+
+	public Stats getStats(){
+
+		return getStats(this.root);
+	}
+
+	private Stats getStats(InfoNode node) {
+		Stats status = new Stats();
+		if(node == null){
+			return status;
+		}
+		if(node.getFileType() == FILE){
+			status.totalFile = 1;
+			status.totalPath = 1;
+			return status;
+		}
+
+		if(node.getFileType() == DIRECTORY){
+			status.totalDir = 1;
+			status.totalPath = 1;
+			for(Map.Entry<String, InfoNode> entry : node.getChildren().entrySet()){
+				InfoNode subNode = entry.getValue();
+				status = status.plus(this.getStats(subNode));
+			}
+		}
+		return status;
+
+	}
+
+	public class Stats {
+		public long totalPath = 0;
+		public long totalFile = 0;
+		public long totalDir = 0;
+
+		public Stats plus(Stats stats2){
+			this.totalPath += stats2.totalPath;
+			this.totalFile += stats2.totalFile;
+			this.totalDir += stats2.totalDir;
+			return this;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+				.add("totalPath", totalPath)
+				.add("totalFile", totalFile)
+				.add("totalDir", totalDir)
+				.toString();
+		}
 	}
 }

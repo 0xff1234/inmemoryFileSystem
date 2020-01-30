@@ -80,7 +80,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 
 	@Override
 	public boolean mkdir(String path) {
-		StringUtils.checkIsDirPath(path);
+		StringUtils.checkIsPath(path);
 
 		try {
 			//find and create dir recursively
@@ -129,31 +129,41 @@ public class InMemoryFileSystemSession implements FileSystem {
 
 		//absosult path drill down to the file node
 		absParentDir.appendRelativePath(fileNode);
-		return absParentDir.toString();
+		return absParentDir.toPathStr();
 
 	}
 
 	@Override
 	public String cd(String path) {
-		StringUtils.checkIsDirPath(path);
+		StringUtils.checkIsPath(path);
 
 		try {
 			this.workingDir = this.findAbsDir(path, false);
-			return this.workingDir.toString();
+			return this.workingDir.toPathStr();
 		} catch (PathNotFoundException e) {
 			e.printStackTrace();
 		}
-		return workingDir.toString();
+		return workingDir.toPathStr();
 	}
 
 	@Override
 	public String pwd() {
-		return workingDir.toString();
+		return workingDir.toPathStr();
 	}
 
 	@Override
 	public boolean rm(String path, boolean recursive) {
-		StringUtils.checkIsFilePath(path);
+		StringUtils.checkIsPath(path);
+
+		if( ROOT_PATH.equals(path)){
+			if(recursive){
+				this.mfsInstance.getRoot().getChildren().clear();
+				return true;
+			}else{
+				return false;
+			}
+		}
+
 		String parentDir = StringUtils.extractParentDir(path);
 		String fileName = StringUtils.extractFileName(path);
 
@@ -192,7 +202,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 	 * @throws PathNotFoundException throwed when no suitable path had found
 	 */
 	private AbsolutePath findAbsDir(String path, boolean createIfNotExist) throws PathNotFoundException {
-		StringUtils.checkIsDirPath(path);
+		StringUtils.checkIsPath(path);
 
 		/*
 		 * dertimine the initial diretory to look up
@@ -243,7 +253,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 				lowestDir.addChild(nextDir);
 			} else {
 				// other cases
-				throw new PathNotFoundException("can not find path:" + dir + " in " + absPath.toString());
+				throw new PathNotFoundException("can not find path:" + dir + " in " + absPath.toPathStr());
 			}
 			absPath.appendRelativePath(nextDir);
 			lowestDir = nextDir;
@@ -257,7 +267,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 		* if we can retrive the current working dir from root, then it has not been removed
 		* */
 		try{
-			this.findAbsDir(this.workingDir.toString(), false);
+			this.findAbsDir(this.workingDir.toPathStr(), false);
 			return false;
 		}catch (PathNotFoundException e) {
 			e.printStackTrace();

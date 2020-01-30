@@ -1,8 +1,10 @@
 package com.lyj.mfs.domain;
 
 import static com.lyj.mfs.utils.Const.DELIMITER;
+import static com.lyj.mfs.utils.Const.ROOT_PATH;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,14 +64,23 @@ public class AbsolutePath {
 		return ImmutableList.copyOf(this.paths);
 	}
 
-	@Override
-	public String toString(){
-		return this.paths.get(0).getPath() +
+	/**
+	 * @return the absolute path str of this object
+	 */
+	public String toPathStr(){
+		return ROOT_PATH +
 			Joiner
 			.on(DELIMITER)
 			.join(paths.stream().
 				map(p -> p.getPath()).skip(1)
 				.collect(Collectors.toList())
 			);
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+			.add("paths", paths)
+			.toString();
 	}
 }

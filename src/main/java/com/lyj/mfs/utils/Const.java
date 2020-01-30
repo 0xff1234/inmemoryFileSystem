@@ -1,8 +1,5 @@
 package com.lyj.mfs.utils;
 
-import java.sql.Connection;
-import java.util.function.Consumer;
-
 /**
  * @program: inmemoryFileSystem
  * @description: some const variables

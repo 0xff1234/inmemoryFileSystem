@@ -56,7 +56,7 @@ public class StringUtils {
 		Preconditions.checkArgument(path != null && !"".equals(path) && !path.endsWith(DELIMITER), "file path can not be empty or a directory");
 	}
 
-	public static void checkIsDirPath(String path){
+	public static void checkIsPath(String path){
 		Preconditions.checkArgument(path != null , "dir path can not be null ");
 	}
 
