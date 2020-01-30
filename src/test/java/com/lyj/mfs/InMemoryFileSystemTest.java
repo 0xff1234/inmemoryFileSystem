@@ -11,8 +11,8 @@ public class InMemoryFileSystemTest {
 	private FileSystem fsSession;
 
 	@Before
-	public void setUp() throws Exception {
-		this.fsSession = InMemoryFileSystem.getSession();
+	public void setUp()  {
+		this.fsSession = InMemoryFileSystem.newSession();
 //		this.fsSession.rm("/",true);
 		this.fsSession.mkdir("/foo");
 		this.fsSession.mkdir("/foo/bar");
@@ -25,7 +25,7 @@ public class InMemoryFileSystemTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown()  {
 		this.fsSession.rm("/", true);
 	}
 

@@ -10,14 +10,8 @@ import com.lyj.mfs.domain.InfoNode.FileType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @program: InmemoryFileSystem
- * @description: a in memory implementation for file system
- * @author: LYJ
- * @create: 2020-01-29 22:28
- **/
 
-public class InMemoryFileSystem {
+class InMemoryFileSystem {
 
 	private final static InMemoryFileSystem instance;
 	/**
@@ -34,9 +28,9 @@ public class InMemoryFileSystem {
 	private Map<String, InMemoryFileSystemSession> sessionsMap = new ConcurrentHashMap<>();
 
 
-	/**
-	 * simply use eager initialization to implement singleton pattern
-	 * @return the singleton instane of file system
+	/*
+	  simply use eager initialization to implement singleton pattern
+	  @return the singleton instane of file system
 	 */
 	static{
 		try{
@@ -53,7 +47,7 @@ public class InMemoryFileSystem {
 	/**
 	 * @return a new session for visiting the in memory file system
 	 */
-	public static InMemoryFileSystemSession getSession(){
+	public static InMemoryFileSystemSession newSession(){
 		InMemoryFileSystemSession session = new InMemoryFileSystemSession(instance);
 		instance.sessionsMap.put(session.getSessionId(),session);
 		return session;

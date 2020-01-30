@@ -4,6 +4,7 @@ import static com.lyj.mfs.utils.Const.ROOT_PATH;
 import static org.junit.Assert.*;
 
 import com.lyj.mfs.InMemoryFileSystem.Stats;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
@@ -32,8 +33,8 @@ public class InMemoryFileSystemSessionTest {
 	private ExecutorService threadpool;
 
 	@Before
-	public void setUp() throws Exception {
-		this.fsSession = InMemoryFileSystem.getSession();
+	public void setUp() {
+		this.fsSession = InMemoryFileSystem.newSession();
 		this.threadpool = new ThreadPoolExecutor(100, 500, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(TASK_SIZE));
 
 //		this.fsSession.rm("/",true);
@@ -48,7 +49,7 @@ public class InMemoryFileSystemSessionTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		this.fsSession.rm("/", true);
 	}
 
@@ -61,8 +62,7 @@ public class InMemoryFileSystemSessionTest {
 
 	@Test
 	public void mkdir() {
-		boolean ret = false;
-
+		boolean ret;
 		this.fsSession.cd("/foo/bar/zzz1");
 		this.fsSession.mkdir("xxx1");
 		assertEquals(Arrays.asList("xxx1"), this.fsSession.ls());
@@ -78,7 +78,7 @@ public class InMemoryFileSystemSessionTest {
 
 	@Test
 	public void touch() {
-		String ret = null;
+		String ret;
 		this.fsSession.cd("/foo");
 		ret = this.fsSession.touch("f3");
 		assertEquals("/foo/f3", ret);
@@ -98,7 +98,7 @@ public class InMemoryFileSystemSessionTest {
 
 	@Test
 	public void cd() {
-		String ret = "";
+		String ret;
 		ret = this.fsSession.cd("/");
 		assertEquals(Arrays.asList("foo"), this.fsSession.ls());
 		assertEquals("/", ret);
@@ -113,7 +113,7 @@ public class InMemoryFileSystemSessionTest {
 		assertEquals("/foo", ret);
 
 		ret = this.fsSession.cd("bar/zzz1");
-		assertEquals(Arrays.asList(), this.fsSession.ls());
+		assertEquals(new ArrayList(), this.fsSession.ls());
 		assertEquals("/foo/bar/zzz1", ret);
 
 		ret = this.fsSession.cd("../../");
@@ -130,20 +130,20 @@ public class InMemoryFileSystemSessionTest {
 
 	@Test
 	public void cd2() {
-		String ret = "";
+		String ret;
 
 		ret = this.fsSession.cd("../../../../../");
 		assertEquals(Arrays.asList("foo"), this.fsSession.ls());
 		assertEquals(ROOT_PATH, ret);
 
-		ret = this.fsSession.cd("/foo");
+		this.fsSession.cd("/foo");
 		ret = this.fsSession.cd("/foo/sodfodfdfd");
 		assertEquals("/foo", ret);
 	}
 
 	@Test
 	public void pwd() {
-		String ret = "";
+		String ret;
 		this.fsSession.cd("/foo/bar");
 		ret = this.fsSession.pwd();
 		assertEquals("/foo/bar", ret);
@@ -192,7 +192,7 @@ public class InMemoryFileSystemSessionTest {
 		boolean ret;
 		this.fsSession.cd("/foo/bar/");
 		this.fsSession.rm("/foo", true);
-		assertEquals(Arrays.asList(), this.fsSession.ls());
+		assertEquals(new ArrayList(), this.fsSession.ls());
 	}
 
 
@@ -216,7 +216,7 @@ public class InMemoryFileSystemSessionTest {
 						} catch (BrokenBarrierException | InterruptedException e) {
 							e.printStackTrace();
 						}
-						countingResult.add(InMemoryFileSystem.getSession().getSessionId());
+						countingResult.add(InMemoryFileSystem.newSession().getSessionId());
 						countDownLatch.countDown();
 					}
 				);
@@ -232,7 +232,7 @@ public class InMemoryFileSystemSessionTest {
 	@Test
 	public void multiThreadOperation() throws InterruptedException {
 
-		InMemoryFileSystem.getSession().rm("/", true);
+		InMemoryFileSystem.newSession().rm("/", true);
 
 
 		/*
@@ -254,7 +254,7 @@ public class InMemoryFileSystemSessionTest {
 							e.printStackTrace();
 						}
 						//start do messy things
-						InMemoryFileSystemSession session = InMemoryFileSystem.getSession();
+						InMemoryFileSystemSession session = InMemoryFileSystem.newSession();
 						for(int j = 0; j < 10; ++j){
 							String randomStr = UUID.randomUUID().toString();
 							session.mkdir(randomStr);
