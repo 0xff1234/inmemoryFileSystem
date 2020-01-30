@@ -66,12 +66,14 @@ public class InMemoryFileSystemSessionTest {
 
 	@Test
 	public void mkdir() {
+		boolean ret = false;
 
 		this.fsSession.cd("/foo/bar/zzz1");
 		this.fsSession.mkdir("xxx1");
-
 		assertEquals(Arrays.asList("xxx1"), this.fsSession.ls());
 
+		ret = this.fsSession.mkdir("/foo/f1");
+		assertFalse("there is already a same name file", ret);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

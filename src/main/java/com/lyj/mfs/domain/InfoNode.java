@@ -16,11 +16,27 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * @create: 2020 -01-29 22:22
  */
 public class InfoNode {
+
+	/**
+	 * the relative path/file name
+	 */
 	private final String path;
+
+	/**
+	 * the time we create this file, notice it can be updated by touch method
+	 */
 	private LocalDateTime createTime;
+
 	private final FileType fileType;
+
+	/**
+	 * store sub dir/files, it is the same structure as trie tree
+	 */
 	private Map<String, InfoNode> children;
-	//not used
+
+	/**
+	 *  not used, we can store file content by this field
+	 */
 	private Byte[] content = null;
 
 	/**
@@ -46,6 +62,9 @@ public class InfoNode {
 				this.children = null;
 				break;
 			case DIRECTORY:
+				/*
+				* use ConcurrentSkipListMap to make sure it can be used in multithread environment
+				* */
 				this.children = new ConcurrentSkipListMap<>();
 				break;
 			default:
@@ -72,11 +91,28 @@ public class InfoNode {
 		return children;
 	}
 
+
+	/**
+	 * add a new fileNode to current node
+	 * @param newNode
+	 * @return true if this operation success
+	 */
 	public boolean addChild(InfoNode newNode){
-		this.children.put(newNode.getPath(), newNode);
-		return true;
+		try{
+			this.children.put(newNode.getPath(), newNode);
+			return true;
+		}catch (Throwable e){
+			e.printStackTrace();
+		}
+		return false;
+
 	}
 
+	/**
+	 * delete a fileNode from current node
+	 * @param path
+	 * @return true if this operation success
+	 */
 	public boolean removeChild(String path){
 		this.children.remove(path);
 		return true;

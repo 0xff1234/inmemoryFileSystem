@@ -19,6 +19,7 @@ public class StringUtils {
 	private static Splitter splitter = Splitter.on(DELIMITER).
 		trimResults().omitEmptyStrings();
 
+
 	public static List<String> splitPath(String pathStr){
 		ArrayList<String> paths = new ArrayList<>();
 		Iterable<String> splited = splitter.split(pathStr);
@@ -28,12 +29,22 @@ public class StringUtils {
 		return paths;
 	}
 
+	/**
+	 * extract the last filename or dirname
+	 * @param pathStr the absolute str of path
+	 * @return
+	 */
 	public static String extractFileName(String pathStr){
 		List<String> pathList = splitPath(pathStr);
 		String lastFileName = pathList.get(pathList.size() - 1);
 		return lastFileName;
 	}
 
+	/**
+	 * extract the whole path string without the last filename or dirname
+	 * @param pathStr the absolute str of path
+	 * @return
+	 */
 	public static String extractParentDir(String pathStr){
 		List<String> pathList = splitPath(pathStr);
 		String lastFileName = pathList.get(pathList.size() - 1);

@@ -24,9 +24,9 @@ public class InMemoryFileSystem {
 
 	/**
 	 * if the file system is used by multiple user simultaneous, we should introduce the
-	 * session concepts ,but that is a bit complex. So I just assume that every thread has
-	 * only one session and use threadlocal to store working dir for different threads.
-	 * Be careful while using threadpools, We should call cd("/") at begining.
+	 * session, so that different user have different working directory
+	 * like the usage of ssh client
+	 * sessionsMap is used to store all session data
 	 */
 	private Map<String, InMemoryFileSystemSession> sessionsMap = new ConcurrentHashMap<>();
 
@@ -43,6 +43,9 @@ public class InMemoryFileSystem {
 		}
 	}
 
+	/**
+	 * @return a new session for visiting the in memory file system
+	 */
 	public static InMemoryFileSystemSession getSession(){
 		InMemoryFileSystemSession session = new InMemoryFileSystemSession(instance);
 		instance.sessionsMap.put(session.getSessionId(),session);

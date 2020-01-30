@@ -19,14 +19,29 @@ import java.util.stream.Collectors;
  * @program: inmemoryFileSystem
  * @description: the domain object represent each client session
  * @author: LYJ
- * @create: 2020-01-30 09:01
+ * @create: 2020-01-30 12:01
  **/
 
 public class InMemoryFileSystemSession implements FileSystem {
 
+	/**
+		* a uuid to distinguish sessions
+	 */
 	private final String sessionId;
+
+	/**
+	 * current working directory, will be modified when we call cd()
+	 */
 	private AbsolutePath workingDir;
+
+	/**
+	 * the time that this session was created, can be used to do session timeout, not implement yet
+	 */
 	private final LocalDateTime createTime;
+
+	/**
+	 * the singleton in-memory file system, shared by every session
+	 */
 	private final InMemoryFileSystem mfsInstance;
 
 
@@ -45,10 +60,12 @@ public class InMemoryFileSystemSession implements FileSystem {
 	@Override
 	public Iterable<String> ls() {
 		List<String> ret = new ArrayList<>();
-		/*
-		check if workingDir and it's upper dir has been remove
-		 */
-		if (hasBeenRemoved()) {
+
+		if (workingDirhasBeenRemoved()) {
+			/*
+			check if workingDir or it's upper dir has been remove by somebody
+			if yes, just return empty list
+		    */
 			return ret;
 		}
 
@@ -66,6 +83,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 		StringUtils.checkIsDirPath(path);
 
 		try {
+			//find and create dir recursively
 			AbsolutePath absDir = this.findAbsDir(path, true);
 			return true;
 		} catch (PathNotFoundException e) {
@@ -80,6 +98,10 @@ public class InMemoryFileSystemSession implements FileSystem {
 		String parentDir = StringUtils.extractParentDir(path);
 		String fileName = StringUtils.extractFileName(path);
 		AbsolutePath absParentDir = null;
+
+		/*
+		* 1. find the parent dir path
+		* */
 		try {
 			absParentDir = this.findAbsDir(parentDir, true);
 		} catch (PathNotFoundException e) {
@@ -89,21 +111,24 @@ public class InMemoryFileSystemSession implements FileSystem {
 
 		InfoNode lowestNode = absParentDir.getLowestNode();
 		InfoNode fileNode = lowestNode.getChildren().get(fileName);
+		/*
+		* check the filename is a file or a directory or is not exist
+		* */
 		if (fileNode != null && fileNode.getFileType() == FILE) {
-			// file exist, update the createtime
+			// file exist, only need to update the createtime
 			fileNode.updateCreateTime();
 		} else if (fileNode != null && fileNode.getFileType() == DIRECTORY) {
-			// directory exist, return null
+			//same name directory exist, can not touch new file return null
 			System.out.println("found a directory with same name");
 			return null;
 		} else {
-			// file or directory is not exist, so create a new file
+			// file or directory is not exist, so we can create a new file
 			fileNode = new InfoNode(fileName, FILE);
 			lowestNode.addChild(fileNode);
 		}
 
 		//absosult path drill down to the file node
-		absParentDir.append(fileNode);
+		absParentDir.appendRelativePath(fileNode);
 		return absParentDir.toString();
 
 	}
@@ -150,13 +175,22 @@ public class InMemoryFileSystemSession implements FileSystem {
 			System.out.println("directory can not be removed");
 			return false;
 		}else{
-			// file or (directory + recursive)
+			// file or (directory && recursive)
 			lowestNode.removeChild(fileName);
 		}
 
 		return true;
 	}
 
+	/**
+	 * drill down to the deepest path recursively,and auto determine start from root
+	 * or from current working dir by the path argument
+	 *
+	 * @param path a string of path to be find, can be a relative path or a absolute path
+	 * @param createIfNotExist if true, create new dir when dir is not exist
+	 * @return the absolute path we found or created
+	 * @throws PathNotFoundException throwed when no suitable path had found
+	 */
 	private AbsolutePath findAbsDir(String path, boolean createIfNotExist) throws PathNotFoundException {
 		StringUtils.checkIsDirPath(path);
 
@@ -211,14 +245,17 @@ public class InMemoryFileSystemSession implements FileSystem {
 				// other cases
 				throw new PathNotFoundException("can not find path:" + dir + " in " + absPath.toString());
 			}
-			absPath.append(nextDir);
+			absPath.appendRelativePath(nextDir);
 			lowestDir = nextDir;
 		}
 
 		return absPath;
 	}
 
-	private boolean hasBeenRemoved() {
+	private boolean workingDirhasBeenRemoved() {
+		/*
+		* if we can retrive the current working dir from root, then it has not been removed
+		* */
 		try{
 			this.findAbsDir(this.workingDir.toString(), false);
 			return false;

@@ -22,19 +22,32 @@ public class AbsolutePath {
 		paths.add(root);
 	}
 
+	/**
+	 * Clone form another AbsolutePath object
+	 * @param otherAbsPath another AbsolutePath
+	 */
 	public AbsolutePath(AbsolutePath otherAbsPath){
 		this.paths = new ArrayList<>(otherAbsPath.immutablePaths());
 	}
 
+
+	/**
+	 * helper method to get the last element of a List
+	 * @return the deepest layer directoy
+	 */
 	public InfoNode getLowestNode(){
 		return this.paths.get(this.paths.size() - 1);
 	}
 
-	public synchronized boolean append(InfoNode node){
+	public synchronized boolean appendRelativePath(InfoNode node){
 		paths.add(node);
 		return true;
 	}
 
+	/**
+	 * @return false if there no directory to remove, because
+	 * we must perserve the root path
+	 */
 	public synchronized boolean removeLowest(){
 		if(paths.size() > 1){
 			//help gc
