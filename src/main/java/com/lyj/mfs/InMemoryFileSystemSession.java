@@ -94,6 +94,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 			fileNode.updateCreateTime();
 		} else if (fileNode != null && fileNode.getFileType() == DIRECTORY) {
 			// directory exist, return null
+			System.out.println("found a directory with same name");
 			return null;
 		} else {
 			// file or directory is not exist, so create a new file
@@ -117,7 +118,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 		} catch (PathNotFoundException e) {
 			e.printStackTrace();
 		}
-		return ROOT_PATH;
+		return workingDir.toString();
 	}
 
 	@Override
@@ -150,7 +151,7 @@ public class InMemoryFileSystemSession implements FileSystem {
 			return false;
 		}else{
 			// file or (directory + recursive)
-			fileNode.removeChild(fileName);
+			lowestNode.removeChild(fileName);
 		}
 
 		return true;
